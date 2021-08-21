@@ -1,0 +1,10 @@
+{
+  "uuid": "window-actions@hum.per.sg",
+  "name": "Window Actions",
+  "description": "Adds close window, move to workspace buttons to the Top Bar.",
+  "version": 1,
+  "shell-version": [
+    "40"
+  ],
+  "url": "https://github.com/hum-ler/window-actions-extension"
+}

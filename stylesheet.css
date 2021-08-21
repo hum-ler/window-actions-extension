@@ -1,0 +1,39 @@
+.widget-bin {
+  /* border-width: 0px; */
+  padding: 3px 0px;
+  margin: 0px;
+}
+
+.action-button {
+  width: 40px;
+  height: 32px;
+  border-radius: 20px;
+}
+
+.action-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.close {
+  background-image: url('close.svg');
+}
+
+.close:hover {
+  background-image: url('close-hover.svg');
+}
+
+.move-to-workspace-left {
+  background-image: url('move-to-workspace-left.svg');
+}
+
+.move-to-workspace-left:hover {
+  background-image: url('move-to-workspace-left-hover.svg');
+}
+
+.move-to-workspace-right {
+  background-image: url('move-to-workspace-right.svg');
+}
+
+.move-to-workspace-right:hover {
+  background-image: url('move-to-workspace-right-hover.svg');
+}
