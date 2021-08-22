@@ -40,6 +40,8 @@ function enable() {
     "hidden",
     (_) => { focus_changed(); }
   );
+
+  focus_changed();
 }
 
 function disable() {
@@ -111,6 +113,7 @@ function create_panel_menu_button() {
 
   let panelMenuButton = new PanelMenu.Button(-1, "Window Actions", true);
   panelMenuButton.add_child(boxLayout);
+  panelMenuButton.hide();
 
   return panelMenuButton;
 }
