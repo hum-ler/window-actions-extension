@@ -7,8 +7,9 @@ const Shell = imports.gi.Shell;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Main = imports.ui.main;
+const PanelMenu = imports.ui.panelMenu;
 
-let widget = null;
+let panelMenuButton = null;
 let focusAppHandlerId = 0;
 let overviewShowingHandlerId = 0;
 let overviewHiddenHandlerId = 0;
@@ -21,13 +22,10 @@ function enable() {
 
   load_stylesheet();
 
-  widget = create_widget();
+  panelMenuButton = create_panel_menu_button();
 
-  // Requires a subclass of PanelMenu.Button instead.
-  // Main.panel.addToStatusArea('?', bin, 0, 0);
-
-  // FIXME: Should be inserted above AppMenuButton.
-  Main.panel._leftBox.insert_child_above(widget, null);
+  // FIXME: Should be inserted after the AppMenuButton.
+  Main.panel.addToStatusArea("Window Actions", panelMenuButton, -1, "left");
 
   focusAppHandlerId = Shell.WindowTracker.get_default().connect(
     "notify::focus-app",
@@ -39,15 +37,11 @@ function enable() {
   );
   overviewHiddenHandlerId = Main.overview.connect(
     "hidden",
-    (_) => { focus_changed(); });
-
-  focus_changed();
+    (_) => { focus_changed(); }
+  );
 }
 
 function disable() {
-  destroy_widget(widget);
-  widget = null;
-
   if (focusAppHandlerId !== 0) {
     Shell.WindowTracker.get_default().disconnect(focusAppHandlerId);
     focusAppHandlerId = 0;
@@ -60,6 +54,9 @@ function disable() {
     Main.overview.disconnect(overviewHiddenHandlerId);
     overviewHiddenHandlerId = 0
   }
+
+  destroy_widget(panelMenuButton);
+  panelMenuButton = null;
 }
 
 // Loads the widget style and images.
@@ -69,38 +66,44 @@ function load_stylesheet() {
 }
 
 // Creates the widget holding the buttons.
-function create_widget() {
+function create_panel_menu_button() {
+  // Using background images instead in lieu of proper icons because:
+  // - go-jump-symbolic-rtl is messed up when fill is recolored
+  // - hover effect is easy to achieve
+  // - icons look a bit too big for my taste
   let closeButton = new St.Button({
     style_class: "close action-button",
     track_hover: true
-  });
+  })
   closeButton.connect("button-press-event", (_) => { close(); });
 
   let moveToWorkspaceLeftButton = new St.Button({
     style_class: "move-to-workspace-left action-button",
     track_hover: true
   });
-  moveToWorkspaceLeftButton.connect("button-press-event", (_) => {
-    move_to_workspace_left();
-  });
+  moveToWorkspaceLeftButton.connect(
+    "button-press-event",
+    (_) => { move_to_workspace_left(); }
+  );
 
   let moveToWorkspaceRightButton = new St.Button({
     style_class: "move-to-workspace-right action-button",
     track_hover: true
   });
-  moveToWorkspaceRightButton.connect("button-press-event", (_) => {
-    move_to_workspace_right();
-  })
+  moveToWorkspaceRightButton.connect(
+    "button-press-event",
+    (_) => { move_to_workspace_right(); }
+  );
 
-  let box = new St.BoxLayout({ style_class: "action-button-box" });
-  box.add(closeButton);
-  box.add(moveToWorkspaceLeftButton);
-  box.add(moveToWorkspaceRightButton);
+  let boxLayout = new St.BoxLayout({ style_class: "action-button-box" });
+  boxLayout.add(closeButton);
+  boxLayout.add(moveToWorkspaceLeftButton);
+  boxLayout.add(moveToWorkspaceRightButton);
 
-  let bin = new St.Bin({ style_class: "widget-bin" });
-  bin.set_child(box);
+  let panelMenuButton = new PanelMenu.Button(-1, "Window Actions", true);
+  panelMenuButton.add_child(boxLayout);
 
-  return bin;
+  return panelMenuButton;
 }
 
 // Destroys the widget holding the buttons.
@@ -145,12 +148,12 @@ function move_to_workspace_right() {
 // Shows the widget if there is a window in focus.
 function focus_changed() {
   if (Main.overview.visible) {
-    return widget.hide();
+    return panelMenuButton.hide();
   }
 
   if (global.display.focus_window !== null) {
-    return widget.show();
+    return panelMenuButton.show();
   }
 
-  widget.hide();
+  panelMenuButton.hide();
 }

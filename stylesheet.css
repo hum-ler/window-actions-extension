@@ -1,17 +1,7 @@
-.widget-bin {
-  /* border-width: 0px; */
-  padding: 3px 0px;
-  margin: 0px;
-}
-
 .action-button {
-  width: 40px;
+  width: 32px;
   height: 32px;
-  border-radius: 20px;
-}
-
-.action-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  margin: 0 4px;
 }
 
 .close {
