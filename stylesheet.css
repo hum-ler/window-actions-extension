@@ -1,29 +1,11 @@
 .action-button {
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
+  padding: 4px;
   margin: 0 4px;
+  color: #bdbdbd;
 }
 
-.close {
-  background-image: url('close.svg');
-}
-
-.close:hover {
-  background-image: url('close-hover.svg');
-}
-
-.move-to-workspace-left {
-  background-image: url('move-to-workspace-left.svg');
-}
-
-.move-to-workspace-left:hover {
-  background-image: url('move-to-workspace-left-hover.svg');
-}
-
-.move-to-workspace-right {
-  background-image: url('move-to-workspace-right.svg');
-}
-
-.move-to-workspace-right:hover {
-  background-image: url('move-to-workspace-right-hover.svg');
+.action-button:hover {
+  color: #ffffff;
 }

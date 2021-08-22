@@ -1,8 +1,9 @@
 'use strict';
 
-const St = imports.gi.St;
+const Gio = imports.gi.Gio;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
+const St = imports.gi.St;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -59,7 +60,7 @@ function disable() {
   panelMenuButton = null;
 }
 
-// Loads the widget style and images.
+// Loads the widget style.
 function load_stylesheet() {
   let theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
   theme.load_stylesheet(Me.dir.get_child("stylesheet.css"));
@@ -67,29 +68,37 @@ function load_stylesheet() {
 
 // Creates the widget holding the buttons.
 function create_panel_menu_button() {
-  // Using background images instead in lieu of proper icons because:
-  // - go-jump-symbolic-rtl is messed up when fill is recolored
-  // - hover effect is easy to achieve
-  // - icons look a bit too big for my taste
+  let closeIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "window-close-symbolic" })
+  });
   let closeButton = new St.Button({
-    style_class: "close action-button",
-    track_hover: true
-  })
-  closeButton.connect("button-press-event", (_) => { close(); });
-
-  let moveToWorkspaceLeftButton = new St.Button({
-    style_class: "move-to-workspace-left action-button",
+    style_class: "action-button",
     track_hover: true
   });
+  closeButton.set_child(closeIcon);
+  closeButton.connect("button-press-event", (_) => { close(); });
+
+  let moveToWorkspaceLeftIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "go-previous-symbolic" })
+  });
+  let moveToWorkspaceLeftButton = new St.Button({
+    style_class: "action-button",
+    track_hover: true
+  });
+  moveToWorkspaceLeftButton.set_child(moveToWorkspaceLeftIcon);
   moveToWorkspaceLeftButton.connect(
     "button-press-event",
     (_) => { move_to_workspace_left(); }
   );
 
+  let moveToWorkspaceRightIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "go-next-symbolic" })
+  });
   let moveToWorkspaceRightButton = new St.Button({
-    style_class: "move-to-workspace-right action-button",
+    style_class: "action-button",
     track_hover: true
   });
+  moveToWorkspaceRightButton.set_child(moveToWorkspaceRightIcon);
   moveToWorkspaceRightButton.connect(
     "button-press-event",
     (_) => { move_to_workspace_right(); }
