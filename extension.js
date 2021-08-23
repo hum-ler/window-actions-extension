@@ -18,6 +18,10 @@ let focusWindowHandlerId = 0;
 let overviewShowingHandlerId = 0;
 let overviewHiddenHandlerId = 0;
 
+// Used for monitoring a window for change in the above property.
+let monitorWindow = null;
+let monitorHandlerId = 0;
+
 function init() { }
 
 function enable() {
@@ -199,11 +203,13 @@ function always_on_top() {
 function focus_app_changed() {
   update_buttons_panel();
   update_always_on_top_toggle();
+  monitor_above_property();
 }
 
 // Handles a window change.
 function focus_window_changed() {
   update_always_on_top_toggle();
+  monitor_above_property();
 }
 
 // Updates buttonsPanel if there is a window in focus.
@@ -220,11 +226,24 @@ function update_buttons_panel() {
   buttonsPanel.hide();
 }
 
+// Grabs the window in focus and watches for changes in the above property.
+function monitor_above_property() {
+  let window = global.display.focus_window;
+
+  if (window === null) {
+    disconnect_above();
+  }
+
+  if (window !== null) {
+    if (monitorWindow !== window) {
+      disconnect_above();
+      connect_above(window);
+    }
+  }
+}
+
 // Updates alwaysOnTopToggle if there is a window in focus.
 function update_always_on_top_toggle() {
-  // FIXME: The icon is not updated if user toggles always-on-top using the
-  // actual window menu.
-
   let window = global.display.focus_window;
   if (window !== null) {
     if (window.above) {
@@ -232,5 +251,23 @@ function update_always_on_top_toggle() {
     } else {
       alwaysOnTopToggle.style_class = "action-button";
     }
+  }
+}
+
+// Subscribes to changes in the above property.
+function connect_above(window) {
+  monitorHandlerId = window.connect(
+    "notify::above",
+    () => { update_always_on_top_toggle(); }
+  );
+  monitorWindow = window;
+}
+
+// Unsubscribes from changes in the above property.
+function disconnect_above() {
+  if (monitorWindow !== null) {
+    monitorWindow.disconnect(monitorHandlerId);
+    monitorWindow = null;
+    monitorHandlerId = 0;
   }
 }
