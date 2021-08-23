@@ -10,8 +10,11 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 
-let panelMenuButton = null;
+let buttonsPanel = null;
+let alwaysOnTopToggle = null;
+
 let focusAppHandlerId = 0;
+let focusWindowHandlerId = 0;
 let overviewShowingHandlerId = 0;
 let overviewHiddenHandlerId = 0;
 
@@ -23,31 +26,39 @@ function enable() {
 
   load_stylesheet();
 
-  panelMenuButton = create_panel_menu_button();
+  create_widgets();
 
   // FIXME: Should be inserted after the AppMenuButton.
-  Main.panel.addToStatusArea("Window Actions", panelMenuButton, -1, "left");
+  Main.panel.addToStatusArea("Window Actions", buttonsPanel, -1, "left");
 
   focusAppHandlerId = Shell.WindowTracker.get_default().connect(
     "notify::focus-app",
-    (_) => { focus_changed(); }
+    () => { focus_app_changed(); }
+  );
+  focusWindowHandlerId = global.display.connect(
+    "notify::focus-window",
+    () => { focus_window_changed(); }
   );
   overviewShowingHandlerId = Main.overview.connect(
     "showing",
-    (_) => { focus_changed(); }
+    () => { focus_app_changed(); }
   );
   overviewHiddenHandlerId = Main.overview.connect(
     "hidden",
-    (_) => { focus_changed(); }
+    () => { focus_app_changed(); }
   );
 
-  focus_changed();
+  focus_app_changed();
 }
 
 function disable() {
   if (focusAppHandlerId !== 0) {
     Shell.WindowTracker.get_default().disconnect(focusAppHandlerId);
     focusAppHandlerId = 0;
+  }
+  if (focusWindowHandlerId !== 0) {
+    global.display.disconnect(focusWindowHandlerId);
+    focusWindowHandlerId = 0;
   }
   if (overviewShowingHandlerId !== 0) {
     Main.overview.disconnect(overviewShowingHandlerId);
@@ -58,18 +69,19 @@ function disable() {
     overviewHiddenHandlerId = 0
   }
 
-  destroy_widget(panelMenuButton);
-  panelMenuButton = null;
+  destroy_widgets();
+  buttonsPanel = null;
+  alwaysOnTopToggle = null;
 }
 
-// Loads the widget style.
+// Loads the style for our widgets.
 function load_stylesheet() {
   let theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
   theme.load_stylesheet(Me.dir.get_child("stylesheet.css"));
 }
 
-// Creates the widget holding the buttons.
-function create_panel_menu_button() {
+// Creates all our widgets.
+function create_widgets() {
   let closeIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "window-close-symbolic" })
   });
@@ -78,7 +90,7 @@ function create_panel_menu_button() {
     track_hover: true
   });
   closeButton.set_child(closeIcon);
-  closeButton.connect("button-press-event", (_) => { close(); });
+  closeButton.connect("button-press-event", () => { close(); });
 
   let moveToWorkspaceLeftIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "go-previous-symbolic" })
@@ -90,7 +102,7 @@ function create_panel_menu_button() {
   moveToWorkspaceLeftButton.set_child(moveToWorkspaceLeftIcon);
   moveToWorkspaceLeftButton.connect(
     "button-press-event",
-    (_) => { move_to_workspace_left(); }
+    () => { move_to_workspace_left(); }
   );
 
   let moveToWorkspaceRightIcon = new St.Icon({
@@ -103,25 +115,37 @@ function create_panel_menu_button() {
   moveToWorkspaceRightButton.set_child(moveToWorkspaceRightIcon);
   moveToWorkspaceRightButton.connect(
     "button-press-event",
-    (_) => { move_to_workspace_right(); }
+    () => { move_to_workspace_right(); }
+  );
+
+  let alwaysOnTopIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "go-top-symbolic" })
+  });
+  alwaysOnTopToggle = new St.Button({
+    style_class: "action-button",
+    track_hover: true
+  });
+  alwaysOnTopToggle.set_child(alwaysOnTopIcon);
+  alwaysOnTopToggle.connect(
+    "button-press-event",
+    () => { always_on_top(); }
   );
 
   let boxLayout = new St.BoxLayout({ style_class: "action-button-box" });
   boxLayout.add(closeButton);
   boxLayout.add(moveToWorkspaceLeftButton);
   boxLayout.add(moveToWorkspaceRightButton);
+  boxLayout.add(alwaysOnTopToggle);
 
-  let panelMenuButton = new PanelMenu.Button(-1, "Window Actions", true);
-  panelMenuButton.add_child(boxLayout);
-  panelMenuButton.hide();
-
-  return panelMenuButton;
+  buttonsPanel = new PanelMenu.Button(-1, "Window Actions", true);
+  buttonsPanel.add_child(boxLayout);
+  buttonsPanel.hide();
 }
 
-// Destroys the widget holding the buttons.
-function destroy_widget(widget) {
-  if (widget !== null) {
-    widget.destroy();
+// Destroys all our widgets.
+function destroy_widgets() {
+  if (buttonsPanel !== null) {
+    buttonsPanel.destroy();
   }
 }
 
@@ -157,15 +181,56 @@ function move_to_workspace_right() {
   }
 }
 
-// Shows the widget if there is a window in focus.
-function focus_changed() {
+// Grabs the window in focus and toggles its always-on-top state.
+function always_on_top() {
+  let window = global.display.focus_window;
+  if (window !== null) {
+    if (window.above) {
+      window.unmake_above();
+    } else {
+      window.make_above();
+    }
+
+    update_always_on_top_toggle();
+  }
+}
+
+// Handles an app change.
+function focus_app_changed() {
+  update_buttons_panel();
+  update_always_on_top_toggle();
+}
+
+// Handles a window change.
+function focus_window_changed() {
+  update_always_on_top_toggle();
+}
+
+// Updates buttonsPanel if there is a window in focus.
+function update_buttons_panel() {
   if (Main.overview.visible) {
-    return panelMenuButton.hide();
+    return buttonsPanel.hide();
   }
 
-  if (global.display.focus_window !== null) {
-    return panelMenuButton.show();
+  let window = global.display.focus_window;
+  if (window !== null) {
+    return buttonsPanel.show();
   }
 
-  panelMenuButton.hide();
+  buttonsPanel.hide();
+}
+
+// Updates alwaysOnTopToggle if there is a window in focus.
+function update_always_on_top_toggle() {
+  // FIXME: The icon is not updated if user toggles always-on-top using the
+  // actual window menu.
+
+  let window = global.display.focus_window;
+  if (window !== null) {
+    if (window.above) {
+      alwaysOnTopToggle.style_class = "action-button activated";
+    } else {
+      alwaysOnTopToggle.style_class = "action-button";
+    }
+  }
 }

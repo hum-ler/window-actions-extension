@@ -9,3 +9,7 @@
 .action-button:hover {
   color: #ffffff;
 }
+
+.activated {
+  color: #ffffff !important;
+}

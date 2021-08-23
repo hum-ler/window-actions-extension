@@ -1,7 +1,7 @@
 {
   "uuid": "window-actions@hum.per.sg",
   "name": "Window Actions",
-  "description": "Adds close window, move to workspace buttons to the Top Bar.",
+  "description": "Adds a window close button (amongst others) to the Top Bar.",
   "version": 1,
   "shell-version": [
     "40"
