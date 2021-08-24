@@ -11,6 +11,7 @@ The actions that are added:
 - Move to Workspace Left
 - Move to Workspace Right
 - Always on Top
+- Always on Visible Workspace
 
 ## Test environment
 
