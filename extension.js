@@ -10,6 +10,8 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 
+let settings = null;
+
 let buttonsPanel = null;
 let alwaysOnTopToggle = null;
 let alwaysOnVisibleWorkspaceToggle = null;
@@ -27,6 +29,11 @@ let monitorOnAllWorkspacesHandlerId = 0;
 
 function init() {
   load_stylesheet();
+
+  settings = ExtensionUtils.getSettings(
+    "org.gnome.shell.extensions." + Me.metadata.uuid
+  );
+  enableMonitor = settings.get_boolean("monitor-current-focus-window");
 }
 
 function enable() {
@@ -99,6 +106,12 @@ function create_widgets() {
   });
   closeButton.set_child(closeIcon);
   closeButton.connect("button-press-event", () => { close(); });
+  settings.bind(
+    'show-close-button',
+    closeButton,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
+  );
 
   let moveToWorkspaceLeftIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "go-previous-symbolic" })
@@ -111,6 +124,12 @@ function create_widgets() {
   moveToWorkspaceLeftButton.connect(
     "button-press-event",
     () => { move_to_workspace_left(); }
+  );
+  settings.bind(
+    'show-move-to-workspace-left-button',
+    moveToWorkspaceLeftButton,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
   );
 
   let moveToWorkspaceRightIcon = new St.Icon({
@@ -125,6 +144,12 @@ function create_widgets() {
     "button-press-event",
     () => { move_to_workspace_right(); }
   );
+  settings.bind(
+    'show-move-to-workspace-right-button',
+    moveToWorkspaceRightButton,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
+  );
 
   let alwaysOnTopIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "go-top-symbolic" })
@@ -138,6 +163,12 @@ function create_widgets() {
     "button-press-event",
     () => { always_on_top(); }
   );
+  settings.bind(
+    'show-always-on-top-toggle',
+    alwaysOnTopToggle,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
+  );
 
   let alwaysOnVisibleWorkspaceIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "object-flip-horizontal-symbolic" })
@@ -150,6 +181,12 @@ function create_widgets() {
   alwaysOnVisibleWorkspaceToggle.connect(
     "button-press-event",
     () => { always_on_visible_workspace(); }
+  );
+  settings.bind(
+    'show-always-on-visible-workspace-toggle',
+    alwaysOnVisibleWorkspaceToggle,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
   );
 
   let boxLayout = new St.BoxLayout({ style_class: "action-button-box" });
