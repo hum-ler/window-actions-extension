@@ -13,3 +13,8 @@
 .activated {
   color: #ffffff !important;
 }
+
+.grid {
+  margin: 20px;
+  padding: 20px;
+}
