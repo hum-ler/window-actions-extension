@@ -1,6 +1,6 @@
 'use strict';
 
-const { Gio, Meta, Shell, St } = imports.gi;
+const { Gio, Graphene, Meta, Shell, St } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -11,6 +11,7 @@ const PanelMenu = imports.ui.panelMenu;
 let settings = null;
 
 let buttonsPanel = null;
+let maximizeToggle = null;
 let alwaysOnTopToggle = null;
 let alwaysOnVisibleWorkspaceToggle = null;
 
@@ -22,6 +23,8 @@ let overviewHiddenHandlerId = 0;
 // Used for monitoring the focus window for property changes.
 let enableMonitor = false;
 let monitorWindow = null;
+let monitorMaximizedHorizontallyHandlerId = 0;
+let monitorMaximizedVerticallyHandlerId = 0;
 let monitorAboveHandlerId = 0;
 let monitorOnAllWorkspacesHandlerId = 0;
 
@@ -87,6 +90,38 @@ function disable() {
 
 // Creates the widgets.
 function create_widgets() {
+  let minimizeIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "window-minimize-symbolic" })
+  });
+  let minimizeButton = new St.Button({
+    style_class: "action-button",
+    track_hover: true
+  });
+  minimizeButton.set_child(minimizeIcon);
+  minimizeButton.connect("button-press-event", () => { minimize(); });
+  settings.bind(
+    'show-minimize-button',
+    minimizeButton,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
+  );
+
+  let maximizeIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "window-maximize-symbolic" })
+  });
+  maximizeToggle = new St.Button({
+    style_class: "action-button",
+    track_hover: true
+  });
+  maximizeToggle.set_child(maximizeIcon);
+  maximizeToggle.connect("button-press-event", () => { maximize(); });
+  settings.bind(
+    'show-maximize-toggle',
+    maximizeToggle,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
+  );
+
   let closeIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "window-close-symbolic" })
   });
@@ -99,6 +134,24 @@ function create_widgets() {
   settings.bind(
     'show-close-button',
     closeButton,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
+  );
+
+  let shadeIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "window-minimize-symbolic" }),
+    scale_y: -1,
+    pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 })
+  });
+  let shadeButton = new St.Button({
+    style_class: "action-button",
+    track_hover: true
+  });
+  shadeButton.set_child(shadeIcon);
+  shadeButton.connect("button-press-event", () => { shade(); });
+  settings.bind(
+    'show-shade-button',
+    shadeButton,
     'visible',
     Gio.SettingsBindFlags.DEFAULT
   );
@@ -180,7 +233,10 @@ function create_widgets() {
   );
 
   let boxLayout = new St.BoxLayout({ style_class: "action-button-box" });
+  boxLayout.add(minimizeButton);
+  boxLayout.add(maximizeToggle);
   boxLayout.add(closeButton);
+  boxLayout.add(shadeButton);
   boxLayout.add(moveToWorkspaceLeftButton);
   boxLayout.add(moveToWorkspaceRightButton);
   boxLayout.add(alwaysOnTopToggle);
@@ -198,11 +254,42 @@ function destroy_widgets() {
   }
 }
 
+// Grabs the focus window and minimizes it.
+function minimize() {
+  let window = global.display.focus_window;
+  if (window !== null && window.can_minimize()) {
+    window.minimize();
+  }
+}
+
+// Grabs the focus window and toggles its maximize state.
+function maximize() {
+  let window = global.display.focus_window;
+  if (window !== null && window.can_maximize()) {
+    let flags = window.get_maximized();
+    if (flags !== 0) {
+      window.unmaximize(flags);
+    } else {
+      window.maximize(Meta.MaximizeFlags.BOTH);
+    }
+
+    update_maximize_toggle();
+  }
+}
+
 // Grabs the focus window and deletes it.
 function close() {
   let window = global.display.focus_window;
   if (window !== null && window.can_close()) {
     window.delete(global.get_current_time());
+  }
+}
+
+// Grabs the focus window and shades it.
+function shade() {
+  let window = global.display.focus_window;
+  if (window !== null && window.can_shade()) {
+    window.shade(global.get_current_time());
   }
 }
 
@@ -292,8 +379,21 @@ function update_buttons_panel() {
 
 // Updates the toggles.
 function update_toggles() {
+  update_maximize_toggle();
   update_always_on_top_toggle();
   update_always_on_visible_workspace_toggle();
+}
+
+// Updates maximizeToggle if there is a current focus window.
+function update_maximize_toggle() {
+  let window = global.display.focus_window;
+  if (window !== null) {
+    if (window.get_maximized() !== 0) {
+      maximizeToggle.style_class = "action-button activated";
+    } else {
+      maximizeToggle.style_class = "action-button";
+    }
+  }
 }
 
 // Updates alwaysOnTopToggle if there is a current focus window.
@@ -336,6 +436,14 @@ function monitor_focus_window() {
 
 // Subscribes to changes in monitored properties.
 function connect_focus_window_signals(window) {
+  monitorMaximizedHorizontallyHandlerId = window.connect(
+    "notify::maximized-horizontally",
+    () => { update_maximize_toggle(); }
+  );
+  monitorMaximizedVerticallyHandlerId = window.connect(
+    "notify::maximized-vertically",
+    () => { update_maximize_toggle(); }
+  );
   monitorAboveHandlerId = window.connect(
     "notify::above",
     () => { update_always_on_top_toggle(); }
@@ -350,9 +458,13 @@ function connect_focus_window_signals(window) {
 // Unsubscribes from changes in monitored properties.
 function disconnect_focus_window_signals() {
   if (monitorWindow !== null) {
+    monitorWindow.disconnect(monitorMaximizedHorizontallyHandlerId);
+    monitorWindow.disconnect(monitorMaximizedVerticallyHandlerId);
     monitorWindow.disconnect(monitorAboveHandlerId);
     monitorWindow.disconnect(monitorOnAllWorkspacesHandlerId);
     monitorWindow = null;
+    monitorMaximizedHorizontallyHandlerId = 0;
+    monitorMaximizedVerticallyHandlerId = 0;
     monitorAboveHandlerId = 0;
     monitorOnAllWorkspacesHandlerId = 0;
   }

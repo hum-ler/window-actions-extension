@@ -8,7 +8,7 @@
     </style>
     <child>
       <object class="GtkLabel">
-        <property name="label">Show button for Close</property>
+        <property name="label">Show button for Minimize</property>
         <property name="halign">GTK_ALIGN_START</property>
         <layout>
           <property name="column">0</property>
@@ -17,10 +17,64 @@
       </object>
     </child>
     <child>
-      <object class="GtkSwitch" id="showCloseButtonSwitch">
+      <object class="GtkSwitch" id="showMinimizeButtonSwitch">
         <layout>
           <property name="column">1</property>
           <property name="row">0</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="label">Show toggle for Maximize</property>
+        <property name="halign">GTK_ALIGN_START</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="row">1</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSwitch" id="showMaximizeToggleSwitch">
+        <layout>
+          <property name="column">1</property>
+          <property name="row">1</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="label">Show button for Close</property>
+        <property name="halign">GTK_ALIGN_START</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="row">2</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSwitch" id="showCloseButtonSwitch">
+        <layout>
+          <property name="column">1</property>
+          <property name="row">2</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="label">Show button for Shade</property>
+        <property name="halign">GTK_ALIGN_START</property>
+        <layout>
+          <property name="column">0</property>
+          <property name="row">3</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSwitch" id="showShadeButtonSwitch">
+        <layout>
+          <property name="column">1</property>
+          <property name="row">3</property>
         </layout>
       </object>
     </child>
@@ -30,7 +84,7 @@
         <property name="halign">GTK_ALIGN_START</property>
         <layout>
           <property name="column">0</property>
-          <property name="row">1</property>
+          <property name="row">4</property>
         </layout>
       </object>
     </child>
@@ -38,7 +92,7 @@
       <object class="GtkSwitch" id="showMoveToWorkspaceLeftButtonSwitch">
         <layout>
           <property name="column">1</property>
-          <property name="row">1</property>
+          <property name="row">4</property>
         </layout>
       </object>
     </child>
@@ -48,7 +102,7 @@
         <property name="halign">GTK_ALIGN_START</property>
         <layout>
           <property name="column">0</property>
-          <property name="row">2</property>
+          <property name="row">5</property>
         </layout>
       </object>
     </child>
@@ -56,7 +110,7 @@
       <object class="GtkSwitch" id="showMoveToWorkspaceRightButtonSwitch">
         <layout>
           <property name="column">1</property>
-          <property name="row">2</property>
+          <property name="row">5</property>
         </layout>
       </object>
     </child>
@@ -66,7 +120,7 @@
         <property name="halign">GTK_ALIGN_START</property>
         <layout>
           <property name="column">0</property>
-          <property name="row">3</property>
+          <property name="row">6</property>
         </layout>
       </object>
     </child>
@@ -74,7 +128,7 @@
       <object class="GtkSwitch" id="showAlwaysOnTopToggleSwitch">
         <layout>
           <property name="column">1</property>
-          <property name="row">3</property>
+          <property name="row">6</property>
         </layout>
       </object>
     </child>
@@ -84,7 +138,7 @@
         <property name="halign">GTK_ALIGN_START</property>
         <layout>
           <property name="column">0</property>
-          <property name="row">4</property>
+          <property name="row">7</property>
         </layout>
       </object>
     </child>
@@ -92,7 +146,7 @@
       <object class="GtkSwitch" id="showAlwaysOnVisibleWorkspaceToggleSwitch">
         <layout>
           <property name="column">1</property>
-          <property name="row">4</property>
+          <property name="row">7</property>
         </layout>
       </object>
     </child>
@@ -100,7 +154,7 @@
       <object class="GtkLabel">
         <layout>
           <property name="column">0</property>
-          <property name="row">5</property>
+          <property name="row">8</property>
           <property name="column-span">2</property>
         </layout>
       </object>
@@ -111,7 +165,7 @@
         <property name="halign">GTK_ALIGN_START</property>
         <layout>
           <property name="column">0</property>
-          <property name="row">6</property>
+          <property name="row">9</property>
         </layout>
       </object>
     </child>
@@ -119,7 +173,7 @@
       <object class="GtkSwitch" id="monitorCurrentFocusWindowSwitch">
         <layout>
           <property name="column">1</property>
-          <property name="row">6</property>
+          <property name="row">9</property>
         </layout>
       </object>
     </child>

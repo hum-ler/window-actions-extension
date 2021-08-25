@@ -7,23 +7,14 @@ This is a GNOME Shell extension.
 The code is inspired by https://github.com/PWall2222/WB.
 
 The actions that are added:
+- Minimize
+- Maximize
 - Close
+- Shade
 - Move to Workspace Left
 - Move to Workspace Right
 - Always on Top
 - Always on Visible Workspace
-
-## Rationale
-
-Personally, I use the extension GTK Title Bar which hides the title bar when a window is maximized. This extension is just a quick hack to recover some of the functionality that is hidden away in the window menu, or on the title bar itself.
-
-The actions that will *NOT* be added:
-- Minimize -- there is no longer a Window List by default
-- Maximize -- drag the window to the top of the screen
-- Restore -- drag down from the Top Bar
-- Shade -- does not work on Wayland apps
-- Move -- no change, just move the window as usual
-- Resize -- no change, just resize the window as usual
 
 ## Test environment
 
@@ -46,4 +37,4 @@ The actions that will *NOT* be added:
 
 Show the preferences window: `gnome-extensions prefs window-actions@hum.per.sg`
 
-The option "Monitor the current focus window for changes" makes the extension's toggles update in real time, at the expense of some processing power. It is only necessary if you set "Always on Top" or "Always on Visible Workspace" from the actual window menu.
+The option "Monitor the current focus window for changes" makes the extension's toggles update in real time, at the expense of some processing power. Enable it if you also use the window menu (i.e. right-click on the title bar) or the title bar itself to set "Always on Top" / "Always on Visible Workspace", or to maximize / restore windows.

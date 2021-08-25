@@ -24,8 +24,26 @@ function buildPrefsWidget() {
   builder.add_from_file(Me.dir.get_child("prefs.ui").get_path());
 
   settings.bind(
+    "show-minimize-button",
+    builder.get_object("showMinimizeButtonSwitch"),
+    "active",
+    Gio.SettingsBindFlags.DEFAULT
+  );
+  settings.bind(
+    "show-maximize-toggle",
+    builder.get_object("showMaximizeToggleSwitch"),
+    "active",
+    Gio.SettingsBindFlags.DEFAULT
+  );
+  settings.bind(
     "show-close-button",
     builder.get_object("showCloseButtonSwitch"),
+    "active",
+    Gio.SettingsBindFlags.DEFAULT
+  );
+  settings.bind(
+    "show-shade-button",
+    builder.get_object("showShadeButtonSwitch"),
     "active",
     Gio.SettingsBindFlags.DEFAULT
   );

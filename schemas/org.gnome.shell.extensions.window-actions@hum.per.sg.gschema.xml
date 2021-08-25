@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
   <schema id="org.gnome.shell.extensions.window-actions@hum.per.sg" path="/org/gnome/shell/extensions/window-actions@hum.per.sg/">
+    <key name="show-minimize-button" type="b">
+      <default>false</default>
+    </key>
+    <key name="show-maximize-toggle" type="b">
+      <default>false</default>
+    </key>
     <key name="show-close-button" type="b">
       <default>true</default>
+    </key>
+    <key name="show-shade-button" type="b">
+      <default>false</default>
     </key>
     <key name="show-move-to-workspace-left-button" type="b">
       <default>true</default>
