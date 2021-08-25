@@ -1,12 +1,10 @@
 'use strict';
 
-const Gio = imports.gi.Gio;
-const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
-const St = imports.gi.St;
+const { Gio, Meta, Shell, St } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
+
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 
@@ -21,14 +19,15 @@ let focusWindowHandlerId = 0;
 let overviewShowingHandlerId = 0;
 let overviewHiddenHandlerId = 0;
 
-// Used for monitoring the focus window for changes in properties.
+// Used for monitoring the focus window for property changes.
 let enableMonitor = false;
 let monitorWindow = null;
 let monitorAboveHandlerId = 0;
 let monitorOnAllWorkspacesHandlerId = 0;
 
 function init() {
-  load_stylesheet();
+  let theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
+  theme.load_stylesheet(Me.dir.get_child("stylesheet.css"));
 
   settings = ExtensionUtils.getSettings(
     "org.gnome.shell.extensions." + Me.metadata.uuid
@@ -37,9 +36,6 @@ function init() {
 }
 
 function enable() {
-  // Refer to AppMenuButton implementation in
-  // https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/panel.js.
-
   create_widgets();
 
   // FIXME: Should be inserted after the AppMenuButton.
@@ -89,13 +85,7 @@ function disable() {
   alwaysOnVisibleWorkspaceToggle = null;
 }
 
-// Loads the style for our widgets.
-function load_stylesheet() {
-  let theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
-  theme.load_stylesheet(Me.dir.get_child("stylesheet.css"));
-}
-
-// Creates all our widgets.
+// Creates the widgets.
 function create_widgets() {
   let closeIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "window-close-symbolic" })
@@ -201,7 +191,7 @@ function create_widgets() {
   buttonsPanel.hide();
 }
 
-// Destroys all our widgets.
+// Destroys the widgets.
 function destroy_widgets() {
   if (buttonsPanel !== null) {
     buttonsPanel.destroy();
@@ -211,8 +201,7 @@ function destroy_widgets() {
 // Grabs the focus window and deletes it.
 function close() {
   let window = global.display.focus_window;
-
-  if (window !== null) {
+  if (window !== null && window.can_close()) {
     window.delete(global.get_current_time());
   }
 }
@@ -271,8 +260,7 @@ function always_on_visible_workspace() {
 // Handles a focus app change.
 function focus_app_changed() {
   update_buttons_panel();
-  update_always_on_top_toggle();
-  update_always_on_visible_workspace_toggle();
+  update_toggles();
 
   if (enableMonitor) {
     monitor_focus_window();
@@ -281,15 +269,14 @@ function focus_app_changed() {
 
 // Handles a focus window change.
 function focus_window_changed() {
-  update_always_on_top_toggle();
-  update_always_on_visible_workspace_toggle();
+  update_toggles();
 
   if (enableMonitor) {
     monitor_focus_window();
   }
 }
 
-// Updates buttonsPanel if there is a focus window.
+// Updates buttonsPanel if there is a current focus window.
 function update_buttons_panel() {
   if (Main.overview.visible) {
     return buttonsPanel.hide();
@@ -303,7 +290,13 @@ function update_buttons_panel() {
   buttonsPanel.hide();
 }
 
-// Updates alwaysOnTopToggle if there is a focus window.
+// Updates the toggles.
+function update_toggles() {
+  update_always_on_top_toggle();
+  update_always_on_visible_workspace_toggle();
+}
+
+// Updates alwaysOnTopToggle if there is a current focus window.
 function update_always_on_top_toggle() {
   let window = global.display.focus_window;
   if (window !== null) {
@@ -315,7 +308,7 @@ function update_always_on_top_toggle() {
   }
 }
 
-// Updates alwaysOnVisibleWorkspaceToggle if there is a focus window.
+// Updates alwaysOnVisibleWorkspaceToggle if there is a current focus window.
 function update_always_on_visible_workspace_toggle() {
   let window = global.display.focus_window;
   if (window !== null) {
@@ -327,19 +320,17 @@ function update_always_on_visible_workspace_toggle() {
   }
 }
 
-// Monitors changes to the current focus window's properties.
+// Monitors the current focus window for property changes.
 function monitor_focus_window() {
   let window = global.display.focus_window;
 
   if (window === null) {
-    disconnect_focus_window_signals();
+    return disconnect_focus_window_signals();
   }
 
-  if (window !== null) {
-    if (monitorWindow !== window) {
-      disconnect_focus_window_signals();
-      connect_focus_window_signals(window);
-    }
+  if (monitorWindow !== window) {
+    disconnect_focus_window_signals();
+    connect_focus_window_signals(window);
   }
 }
 

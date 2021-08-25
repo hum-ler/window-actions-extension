@@ -14,7 +14,7 @@
       <default>true</default>
     </key>
     <key name="show-always-on-visible-workspace-toggle" type="b">
-      <default>true</default>
+      <default>false</default>
     </key>
     <key name="monitor-current-focus-window" type="b">
       <default>false</default>
