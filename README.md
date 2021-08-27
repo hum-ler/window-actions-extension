@@ -4,8 +4,6 @@ Adds a Close button (amongst others) to the AppMenuButton.
 
 This is a GNOME Shell extension.
 
-The code is inspired by https://github.com/PWall2222/WB.
-
 ## About This Extension
 
 There are several extensions that hide the title bar when a window is maximized. This extension complements them by recovering some of the functionality that is hidden away in the window menu, or on the title bar itself.
@@ -25,10 +23,14 @@ The actions that will *NOT* be added:
 - Move -- no change, just move the window as usual
 - Resize -- no change, just resize the window as usual
 
+The code is inspired by https://github.com/PWall2222/WB.
+
 ## Test environment
 
 - Fedora 34
-- GNOME 40 (Wayland)
+- Wayland
+- GNOME 40
+- English
 
 ## Installation
 
