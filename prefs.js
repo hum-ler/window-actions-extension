@@ -48,6 +48,18 @@ function buildPrefsWidget() {
     Gio.SettingsBindFlags.DEFAULT
   );
   settings.bind(
+    "show-move-button",
+    builder.get_object("showMoveButtonSwitch"),
+    "active",
+    Gio.SettingsBindFlags.DEFAULT
+  );
+  settings.bind(
+    "show-resize-button",
+    builder.get_object("showResizeButtonSwitch"),
+    "active",
+    Gio.SettingsBindFlags.DEFAULT
+  );
+  settings.bind(
     "show-move-to-workspace-left-button",
     builder.get_object("showMoveToWorkspaceLeftButtonSwitch"),
     "active",

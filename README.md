@@ -11,6 +11,8 @@ The actions that are added:
 - Maximize
 - Close
 - Shade
+- Move
+- Resize
 - Move to Workspace Left
 - Move to Workspace Right
 - Always on Top

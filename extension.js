@@ -156,6 +156,42 @@ function create_widgets() {
     Gio.SettingsBindFlags.DEFAULT
   );
 
+  let moveIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "value-increase-symbolic" })
+  });
+  let moveButton = new St.Button({
+    style_class: "action-button",
+    track_hover: true
+  });
+  moveButton.set_child(moveIcon);
+  moveButton.connect("button-press-event", () => { move(); });
+  settings.bind(
+    'show-move-button',
+    moveButton,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
+  );
+
+  let resizeIcon = new St.Icon({
+    gicon: new Gio.ThemedIcon({ name: "go-next-symbolic" }),
+    rotation_angle_z: 45,
+    translation_x: 4,
+    translation_y: 4,
+    pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 })
+  });
+  let resizeButton = new St.Button({
+    style_class: "action-button",
+    track_hover: true
+  });
+  resizeButton.set_child(resizeIcon);
+  resizeButton.connect("button-press-event", () => { resize(); });
+  settings.bind(
+    'show-resize-button',
+    resizeButton,
+    'visible',
+    Gio.SettingsBindFlags.DEFAULT
+  );
+
   let moveToWorkspaceLeftIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "go-previous-symbolic" })
   });
@@ -237,6 +273,8 @@ function create_widgets() {
   boxLayout.add(maximizeToggle);
   boxLayout.add(closeButton);
   boxLayout.add(shadeButton);
+  boxLayout.add(moveButton);
+  boxLayout.add(resizeButton);
   boxLayout.add(moveToWorkspaceLeftButton);
   boxLayout.add(moveToWorkspaceRightButton);
   boxLayout.add(alwaysOnTopToggle);
@@ -290,6 +328,24 @@ function shade() {
   let window = global.display.focus_window;
   if (window !== null && window.can_shade()) {
     window.shade(global.get_current_time());
+  }
+}
+
+function move() {
+  let window = global.display.focus_window;
+  if (window !== null && window.allows_move()) {
+    window.begin_grab_op(Meta.GrabOp.MOVING, true, global.get_current_time());
+  }
+}
+
+function resize() {
+  let window = global.display.focus_window;
+  if (window !== null && window.resizeable) {
+    window.begin_grab_op(
+      Meta.GrabOp.RESIZING_SE,
+      true,
+      global.get_current_time()
+    );
   }
 }
 
