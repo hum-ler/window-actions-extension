@@ -6,7 +6,6 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const Main = imports.ui.main;
-const PanelMenu = imports.ui.panelMenu;
 
 let settings = null;
 
