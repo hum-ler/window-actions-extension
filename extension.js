@@ -9,14 +9,22 @@ const Main = imports.ui.main;
 
 let settings = null;
 
+// Widgets that need to be updated.
 let buttonsBox = null;
 let alwaysOnTopToggle = null;
 let alwaysOnVisibleWorkspaceToggle = null;
 
+const Mode = {
+  LIGHT: 1,   // No watch
+  NORMAL: 2,  // Watch focus_window
+  FULL: 3     // Watch focus_window, above, on_all_workspaces
+};
+let mode = Mode.NORMAL;
+
+// Used in NORMAL mode.
 let focusWindowHandlerId = 0;
 
-// Used for monitoring the focus window for property changes.
-let enableMonitor = false;
+// Used in FULL mode.
 let monitorWindow = null;
 let monitorAboveHandlerId = 0;
 let monitorOnAllWorkspacesHandlerId = 0;
@@ -28,25 +36,32 @@ function init() {
   settings = ExtensionUtils.getSettings(
     "org.gnome.shell.extensions." + Me.metadata.uuid
   );
-  enableMonitor = settings.get_boolean("monitor-current-focus-window");
+  mode = settings.get_int("mode");
 }
 
 function enable() {
   create_widgets();
   Main.panel.statusArea["appMenu"]._container.add_actor(buttonsBox);
 
-  focusWindowHandlerId = global.display.connect(
-    "notify::focus-window",
-    () => { focus_window_changed(); }
-  );
+  if (mode !== Mode.LIGHT) {
+    focusWindowHandlerId = global.display.connect(
+      "notify::focus-window",
+      () => { focus_window_changed(); }
+    );
 
-  focus_window_changed();
+    focus_window_changed();
+  }
 }
 
 function disable() {
   if (focusWindowHandlerId !== 0) {
     global.display.disconnect(focusWindowHandlerId);
     focusWindowHandlerId = 0;
+  }
+
+  if (monitorWindow !== null) {
+    disconnect_focus_window_signals();
+    monitorWindow = null;
   }
 
   destroy_widgets();
@@ -56,6 +71,9 @@ function disable() {
 }
 
 // Creates the widgets.
+//
+// Creates buttonsBox, alwaysOnTopToggle and alwaysOnVisibleWorkspaceToggle at
+// the global level.
 function create_widgets() {
   let closeIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "window-close-symbolic" })
@@ -158,6 +176,9 @@ function create_widgets() {
 }
 
 // Destroys the widgets.
+//
+// Destroys buttonsBox, alwaysOnTopToggle and alwaysOnVisibleWorkspaceToggle at
+// the global level.
 function destroy_widgets() {
   if (buttonsBox !== null) {
     buttonsBox.destroy();
@@ -205,7 +226,9 @@ function always_on_top() {
       window.make_above();
     }
 
-    update_always_on_top_toggle();
+    if (mode !== Mode.LIGHT) {
+      update_always_on_top_toggle();
+    }
   }
 }
 
@@ -219,7 +242,9 @@ function always_on_visible_workspace() {
       window.stick();
     }
 
-    update_always_on_visible_workspace_toggle();
+    if (mode !== Mode.LIGHT) {
+      update_always_on_visible_workspace_toggle();
+    }
   }
 }
 
@@ -227,7 +252,7 @@ function always_on_visible_workspace() {
 function focus_window_changed() {
   update_toggles();
 
-  if (enableMonitor) {
+  if (mode === Mode.FULL) {
     monitor_focus_window();
   }
 }
@@ -238,7 +263,7 @@ function update_toggles() {
   update_always_on_visible_workspace_toggle();
 }
 
-// Updates alwaysOnTopToggle if there is a current focus window.
+// Updates alwaysOnTopToggle if there is a focus window.
 function update_always_on_top_toggle() {
   let window = global.display.focus_window;
   if (window !== null) {
@@ -250,7 +275,7 @@ function update_always_on_top_toggle() {
   }
 }
 
-// Updates alwaysOnVisibleWorkspaceToggle if there is a current focus window.
+// Updates alwaysOnVisibleWorkspaceToggle if there is a focus window.
 function update_always_on_visible_workspace_toggle() {
   let window = global.display.focus_window;
   if (window !== null) {

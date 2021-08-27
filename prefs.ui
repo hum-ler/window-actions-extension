@@ -13,13 +13,14 @@
         <layout>
           <property name="column">0</property>
           <property name="row">0</property>
+          <property name="column-span">2</property>
         </layout>
       </object>
     </child>
     <child>
       <object class="GtkSwitch" id="showCloseButtonSwitch">
         <layout>
-          <property name="column">1</property>
+          <property name="column">3</property>
           <property name="row">0</property>
         </layout>
       </object>
@@ -31,13 +32,14 @@
         <layout>
           <property name="column">0</property>
           <property name="row">1</property>
+          <property name="column-span">2</property>
         </layout>
       </object>
     </child>
     <child>
       <object class="GtkSwitch" id="showMoveToWorkspaceLeftButtonSwitch">
         <layout>
-          <property name="column">1</property>
+          <property name="column">3</property>
           <property name="row">1</property>
         </layout>
       </object>
@@ -49,13 +51,14 @@
         <layout>
           <property name="column">0</property>
           <property name="row">2</property>
+          <property name="column-span">2</property>
         </layout>
       </object>
     </child>
     <child>
       <object class="GtkSwitch" id="showMoveToWorkspaceRightButtonSwitch">
         <layout>
-          <property name="column">1</property>
+          <property name="column">3</property>
           <property name="row">2</property>
         </layout>
       </object>
@@ -67,13 +70,14 @@
         <layout>
           <property name="column">0</property>
           <property name="row">3</property>
+          <property name="column-span">2</property>
         </layout>
       </object>
     </child>
     <child>
       <object class="GtkSwitch" id="showAlwaysOnTopToggleSwitch">
         <layout>
-          <property name="column">1</property>
+          <property name="column">3</property>
           <property name="row">3</property>
         </layout>
       </object>
@@ -85,13 +89,14 @@
         <layout>
           <property name="column">0</property>
           <property name="row">4</property>
+          <property name="column-span">2</property>
         </layout>
       </object>
     </child>
     <child>
       <object class="GtkSwitch" id="showAlwaysOnVisibleWorkspaceToggleSwitch">
         <layout>
-          <property name="column">1</property>
+          <property name="column">3</property>
           <property name="row">4</property>
         </layout>
       </object>
@@ -101,25 +106,77 @@
         <layout>
           <property name="column">0</property>
           <property name="row">5</property>
-          <property name="column-span">2</property>
+          <property name="column-span">3</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkScale" id="modeScale">
+        <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
+        <property name="adjustment">
+          <object class="GtkAdjustment">
+            <property name="value">2</property>
+            <property name="lower">1</property>
+            <property name="upper">3</property>
+            <property name="step-increment">1</property>
+          </object>
+        </property>
+        <property name="round-digits">0</property>
+        <property name="digits">0</property>
+        <marks>
+          <mark value="1" />
+          <mark value="2" />
+          <mark value="3" />
+        </marks>
+        <signal name="value-changed" handler="mode_changed" swapped="no" />
+        <layout>
+          <property name="column">0</property>
+          <property name="row">6</property>
+          <property name="row-span">3</property>
         </layout>
       </object>
     </child>
     <child>
       <object class="GtkLabel">
-        <property name="label">Monitor the current focus window for changes (requires restart)</property>
+        <property name="label">Light mode: toggles are not updated visually</property>
         <property name="halign">GTK_ALIGN_START</property>
         <layout>
-          <property name="column">0</property>
+          <property name="column">1</property>
           <property name="row">6</property>
         </layout>
       </object>
     </child>
     <child>
-      <object class="GtkSwitch" id="monitorCurrentFocusWindowSwitch">
+      <object class="GtkLabel">
+        <property name="label">Normal mode: toggles are updated when focus window is changed</property>
+        <property name="halign">GTK_ALIGN_START</property>
         <layout>
           <property name="column">1</property>
-          <property name="row">6</property>
+          <property name="row">7</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="label">Full mode: toggles are updated when focus window properties are changed</property>
+        <property name="halign">GTK_ALIGN_START</property>
+        <layout>
+          <property name="column">1</property>
+          <property name="row">8</property>
+        </layout>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="label">* Restart GNOME Shell after switching mode</property>
+        <property name="halign">GTK_ALIGN_START</property>
+        <attributes>
+          <attribute name="style" value="italic" />
+        </attributes>
+        <layout>
+          <property name="column">0</property>
+          <property name="row">9</property>
+          <property name="column-span">2</property>
         </layout>
       </object>
     </child>

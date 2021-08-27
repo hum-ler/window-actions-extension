@@ -20,8 +20,8 @@ The actions that will *NOT* be added:
 - Maximize -- drag the window to the top of the screen
 - Restore -- drag down from the Top Bar
 - Shade -- does not work on Wayland apps
-- Move -- no change, just move the window as usual
-- Resize -- no change, just resize the window as usual
+- Move -- no change, move the window as usual
+- Resize -- no change, resize the window as usual
 
 The code is inspired by https://github.com/PWall2222/WB.
 
@@ -48,4 +48,11 @@ The code is inspired by https://github.com/PWall2222/WB.
 
 Show the preferences window: `gnome-extensions prefs window-actions@hum.per.sg`
 
-The option "Monitor the current focus window for changes" makes the extension's toggles update in real time, at the expense of some processing power. It is only necessary if you set "Always on Top" or "Always on Visible Workspace" from the actual window menu.
+The extension mode affects how much resource the extension will use:
+|Mode |Description |
+|-|-|
+|Light|The "Always on Top" and "Always on Visible Workspace" toggles function just like normal buttons.|
+|Normal|If the "Always on Top" and/or "Always on Visible Workspace" state on the window are set, the corresponding toggle will stay highlighted. The toggles are updated whenever the focus window is changed.|
+|Full|If the "Always on Top" and/or "Always on Visible Workspace" state on the window are set, the corresponding toggle will stay highlighted. The toggles are updated whenever the states on the focus window are changed. If, other than the toggles, you also use the window menu to change the states, this mode ensures the toggles remain in sync in real time.|
+
+After changing the mode, restart GNOME Shell for it to take effect.
