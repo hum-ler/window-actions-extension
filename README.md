@@ -1,10 +1,14 @@
 # Window Actions
 
-Adds a window close button (amongst others) to the Top Bar.
+Adds a Close button (amongst others) to the AppMenuButton.
 
 This is a GNOME Shell extension.
 
 The code is inspired by https://github.com/PWall2222/WB.
+
+## About This Extension
+
+There are several extensions that hide the title bar when a window is maximized. This extension complements them by recovering some of the functionality that is hidden away in the window menu, or on the title bar itself.
 
 The actions that are added:
 - Close
@@ -12,10 +16,6 @@ The actions that are added:
 - Move to Workspace Right
 - Always on Top
 - Always on Visible Workspace
-
-## Rationale
-
-Personally, I use the extension GTK Title Bar which hides the title bar when a window is maximized. This extension is just a quick hack to recover some of the functionality that is hidden away in the window menu, or on the title bar itself.
 
 The actions that will *NOT* be added:
 - Minimize -- there is no longer a Window List by default

@@ -10,14 +10,11 @@ const PanelMenu = imports.ui.panelMenu;
 
 let settings = null;
 
-let buttonsPanel = null;
+let buttonsBox = null;
 let alwaysOnTopToggle = null;
 let alwaysOnVisibleWorkspaceToggle = null;
 
-let focusAppHandlerId = 0;
 let focusWindowHandlerId = 0;
-let overviewShowingHandlerId = 0;
-let overviewHiddenHandlerId = 0;
 
 // Used for monitoring the focus window for property changes.
 let enableMonitor = false;
@@ -37,50 +34,24 @@ function init() {
 
 function enable() {
   create_widgets();
+  Main.panel.statusArea["appMenu"]._container.add_actor(buttonsBox);
 
-  // FIXME: Should be inserted after the AppMenuButton.
-  Main.panel.addToStatusArea("Window Actions", buttonsPanel, -1, "left");
-
-  focusAppHandlerId = Shell.WindowTracker.get_default().connect(
-    "notify::focus-app",
-    () => { focus_app_changed(); }
-  );
   focusWindowHandlerId = global.display.connect(
     "notify::focus-window",
     () => { focus_window_changed(); }
   );
-  overviewShowingHandlerId = Main.overview.connect(
-    "showing",
-    () => { focus_app_changed(); }
-  );
-  overviewHiddenHandlerId = Main.overview.connect(
-    "hidden",
-    () => { focus_app_changed(); }
-  );
 
-  focus_app_changed();
+  focus_window_changed();
 }
 
 function disable() {
-  if (focusAppHandlerId !== 0) {
-    Shell.WindowTracker.get_default().disconnect(focusAppHandlerId);
-    focusAppHandlerId = 0;
-  }
   if (focusWindowHandlerId !== 0) {
     global.display.disconnect(focusWindowHandlerId);
     focusWindowHandlerId = 0;
   }
-  if (overviewShowingHandlerId !== 0) {
-    Main.overview.disconnect(overviewShowingHandlerId);
-    overviewShowingHandlerId = 0;
-  }
-  if (overviewHiddenHandlerId !== 0) {
-    Main.overview.disconnect(overviewHiddenHandlerId);
-    overviewHiddenHandlerId = 0
-  }
 
   destroy_widgets();
-  buttonsPanel = null;
+  buttonsBox = null;
   alwaysOnTopToggle = null;
   alwaysOnVisibleWorkspaceToggle = null;
 }
@@ -179,22 +150,18 @@ function create_widgets() {
     Gio.SettingsBindFlags.DEFAULT
   );
 
-  let boxLayout = new St.BoxLayout({ style_class: "action-button-box" });
-  boxLayout.add(closeButton);
-  boxLayout.add(moveToWorkspaceLeftButton);
-  boxLayout.add(moveToWorkspaceRightButton);
-  boxLayout.add(alwaysOnTopToggle);
-  boxLayout.add(alwaysOnVisibleWorkspaceToggle);
-
-  buttonsPanel = new PanelMenu.Button(-1, "Window Actions", true);
-  buttonsPanel.add_child(boxLayout);
-  buttonsPanel.hide();
+  buttonsBox = new St.BoxLayout({ style_class: "action-button-box" });
+  buttonsBox.add(closeButton);
+  buttonsBox.add(moveToWorkspaceLeftButton);
+  buttonsBox.add(moveToWorkspaceRightButton);
+  buttonsBox.add(alwaysOnTopToggle);
+  buttonsBox.add(alwaysOnVisibleWorkspaceToggle);
 }
 
 // Destroys the widgets.
 function destroy_widgets() {
-  if (buttonsPanel !== null) {
-    buttonsPanel.destroy();
+  if (buttonsBox !== null) {
+    buttonsBox.destroy();
   }
 }
 
@@ -257,16 +224,6 @@ function always_on_visible_workspace() {
   }
 }
 
-// Handles a focus app change.
-function focus_app_changed() {
-  update_buttons_panel();
-  update_toggles();
-
-  if (enableMonitor) {
-    monitor_focus_window();
-  }
-}
-
 // Handles a focus window change.
 function focus_window_changed() {
   update_toggles();
@@ -274,20 +231,6 @@ function focus_window_changed() {
   if (enableMonitor) {
     monitor_focus_window();
   }
-}
-
-// Updates buttonsPanel if there is a current focus window.
-function update_buttons_panel() {
-  if (Main.overview.visible) {
-    return buttonsPanel.hide();
-  }
-
-  let window = global.display.focus_window;
-  if (window !== null) {
-    return buttonsPanel.show();
-  }
-
-  buttonsPanel.hide();
 }
 
 // Updates the toggles.

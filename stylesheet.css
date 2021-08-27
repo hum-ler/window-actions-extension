@@ -1,8 +1,12 @@
+.action-button-box {
+  margin-left: 12px;
+}
+
 .action-button {
   width: 20px;
   height: 20px;
   padding: 4px;
-  margin: 0 4px;
+  margin-left: 8px;
   color: #bdbdbd;
 }
 
