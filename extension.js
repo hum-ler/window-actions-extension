@@ -180,6 +180,14 @@ function create_widgets() {
 // Destroys buttonsBox, alwaysOnTopToggle and alwaysOnVisibleWorkspaceToggle at
 // the global level.
 function destroy_widgets() {
+  if (alwaysOnTopToggle !== null) {
+    alwaysOnTopToggle.destroy();
+  }
+
+  if (alwaysOnVisibleWorkspaceToggle !== null) {
+    alwaysOnVisibleWorkspaceToggle.destroy();
+  }
+
   if (buttonsBox !== null) {
     buttonsBox.destroy();
   }
