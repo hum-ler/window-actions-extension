@@ -1,12 +1,14 @@
 'use strict';
 
-const { Gdk, Gio, GObject, Gtk } = imports.gi;
+const { Gdk, Gio, GLib, GObject, Gtk } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const cssProvider = new Gtk.CssProvider();
-cssProvider.load_from_file(Me.dir.get_child("stylesheet.css"));
+const stylesheetFile = Me.dir.get_child("stylesheet.css");
+cssProvider.load_from_file(stylesheetFile);
+stylesheetFile.unref();
 Gtk.StyleContext.add_provider_for_display(
   Gdk.Display.get_default(),
   cssProvider,
@@ -38,9 +40,13 @@ const WindowActionsBuilderScope = GObject.registerClass({
 function init() { }
 
 function buildPrefsWidget() {
-  let builder = new Gtk.Builder();
+  const builder = new Gtk.Builder();
   builder.set_scope(new WindowActionsBuilderScope());
-  builder.add_from_file(Me.dir.get_child("prefs.ui").get_path());
+  const uiFile = Me.dir.get_child("prefs.ui");
+  const uiPath = uiFile.get_path();
+  builder.add_from_file(uiPath);
+  GLib.free(uiPath);
+  uiFile.unref();
 
   settings.bind(
     "show-close-button",
@@ -72,7 +78,7 @@ function buildPrefsWidget() {
     "active",
     Gio.SettingsBindFlags.DEFAULT
   );
-  let modeScale = builder.get_object("modeScale");
+  const modeScale = builder.get_object("modeScale");
   modeScale.set_value(settings.get_int("mode"));
 
   return builder.get_object("prefsWidget");

@@ -30,8 +30,10 @@ let monitorAboveHandlerId = 0;
 let monitorOnAllWorkspacesHandlerId = 0;
 
 function init() {
-  let theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
-  theme.load_stylesheet(Me.dir.get_child("stylesheet.css"));
+  const theme = St.ThemeContext.get_for_stage(global.stage).get_theme();
+  const stylesheetFile = Me.dir.get_child("stylesheet.css");
+  theme.load_stylesheet(stylesheetFile);
+  stylesheetFile.unref();
 
   settings = ExtensionUtils.getSettings(
     "org.gnome.shell.extensions." + Me.metadata.uuid
@@ -75,10 +77,10 @@ function disable() {
 // Creates buttonsBox, alwaysOnTopToggle and alwaysOnVisibleWorkspaceToggle at
 // the global level.
 function create_widgets() {
-  let closeIcon = new St.Icon({
+  const closeIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "window-close-symbolic" })
   });
-  let closeButton = new St.Button({
+  const closeButton = new St.Button({
     style_class: "action-button",
     track_hover: true
   });
@@ -91,10 +93,10 @@ function create_widgets() {
     Gio.SettingsBindFlags.DEFAULT
   );
 
-  let moveToWorkspaceLeftIcon = new St.Icon({
+  const moveToWorkspaceLeftIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "go-previous-symbolic" })
   });
-  let moveToWorkspaceLeftButton = new St.Button({
+  const moveToWorkspaceLeftButton = new St.Button({
     style_class: "action-button",
     track_hover: true
   });
@@ -110,10 +112,10 @@ function create_widgets() {
     Gio.SettingsBindFlags.DEFAULT
   );
 
-  let moveToWorkspaceRightIcon = new St.Icon({
+  const moveToWorkspaceRightIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "go-next-symbolic" })
   });
-  let moveToWorkspaceRightButton = new St.Button({
+  const moveToWorkspaceRightButton = new St.Button({
     style_class: "action-button",
     track_hover: true
   });
@@ -129,7 +131,7 @@ function create_widgets() {
     Gio.SettingsBindFlags.DEFAULT
   );
 
-  let alwaysOnTopIcon = new St.Icon({
+  const alwaysOnTopIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "go-top-symbolic" })
   });
   alwaysOnTopToggle = new St.Button({
@@ -148,7 +150,7 @@ function create_widgets() {
     Gio.SettingsBindFlags.DEFAULT
   );
 
-  let alwaysOnVisibleWorkspaceIcon = new St.Icon({
+  const alwaysOnVisibleWorkspaceIcon = new St.Icon({
     gicon: new Gio.ThemedIcon({ name: "object-flip-horizontal-symbolic" })
   });
   alwaysOnVisibleWorkspaceToggle = new St.Button({
@@ -195,7 +197,7 @@ function destroy_widgets() {
 
 // Grabs the focus window and deletes it.
 function close() {
-  let window = global.display.focus_window;
+  const window = global.display.focus_window;
   if (window !== null && window.can_close()) {
     window.delete(global.get_current_time());
   }
@@ -203,12 +205,12 @@ function close() {
 
 // Grabs the focus window and sends it one workspace over.
 function move_to_workspace_left() {
-  let index = global.workspace_manager.get_active_workspace_index();
+  const index = global.workspace_manager.get_active_workspace_index();
   if (index === 0) {
     return;
   }
 
-  let window = global.display.focus_window;
+  const window = global.display.focus_window;
   if (window !== null && !window.on_all_workspaces) {
     window.change_workspace_by_index(index - 1, false);
   }
@@ -216,9 +218,9 @@ function move_to_workspace_left() {
 
 // Grabs the focus window and sends it one workspace over.
 function move_to_workspace_right() {
-  let index = global.workspace_manager.get_active_workspace_index();
+  const index = global.workspace_manager.get_active_workspace_index();
 
-  let window = global.display.focus_window;
+  const window = global.display.focus_window;
   if (window !== null && !window.on_all_workspaces) {
     window.change_workspace_by_index(index + 1, true);
   }
@@ -226,7 +228,7 @@ function move_to_workspace_right() {
 
 // Grabs the focus window and toggles its always-on-top state.
 function always_on_top() {
-  let window = global.display.focus_window;
+  const window = global.display.focus_window;
   if (window !== null) {
     if (window.above) {
       window.unmake_above();
@@ -242,7 +244,7 @@ function always_on_top() {
 
 // Grabs the focus window and toggles its always-on-visible-workspace state.
 function always_on_visible_workspace() {
-  let window = global.display.focus_window;
+  const window = global.display.focus_window;
   if (window !== null) {
     if (window.on_all_workspaces) {
       window.unstick();
@@ -273,7 +275,7 @@ function update_toggles() {
 
 // Updates alwaysOnTopToggle if there is a focus window.
 function update_always_on_top_toggle() {
-  let window = global.display.focus_window;
+  const window = global.display.focus_window;
   if (window !== null) {
     if (window.above) {
       alwaysOnTopToggle.style_class = "action-button activated";
@@ -285,7 +287,7 @@ function update_always_on_top_toggle() {
 
 // Updates alwaysOnVisibleWorkspaceToggle if there is a focus window.
 function update_always_on_visible_workspace_toggle() {
-  let window = global.display.focus_window;
+  const window = global.display.focus_window;
   if (window !== null) {
     if (window.on_all_workspaces) {
       alwaysOnVisibleWorkspaceToggle.style_class = "action-button activated";
@@ -297,7 +299,7 @@ function update_always_on_visible_workspace_toggle() {
 
 // Monitors the current focus window for property changes.
 function monitor_focus_window() {
-  let window = global.display.focus_window;
+  const window = global.display.focus_window;
 
   if (window === null) {
     return disconnect_focus_window_signals();
