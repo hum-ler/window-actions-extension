@@ -2,9 +2,10 @@
   "uuid": "window-actions@hum.per.sg",
   "name": "Window Actions",
   "description": "Adds a Close button (amongst others) to the AppMenuButton.",
-  "version": 1,
+  "version": 2,
   "shell-version": [
-    "40"
+    "40",
+    "41"
   ],
   "url": "https://github.com/hum-ler/window-actions-extension"
 }
