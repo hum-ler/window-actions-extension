@@ -1,6 +1,8 @@
 # Window Actions
 
-Adds a Close button (amongst others) to the AppMenuButton.
+![Window action buttons](window-actions-extension.png)
+
+Adds a Close button (among others) to the AppMenuButton.
 
 This is a GNOME Shell extension.
 
@@ -27,9 +29,9 @@ The code is inspired by https://github.com/PWall2222/WB.
 
 ## Test environment
 
-- Fedora 34
+- Fedora 35
 - Wayland
-- GNOME 40
+- GNOME 41
 - English
 
 ## Installation
@@ -48,11 +50,13 @@ The code is inspired by https://github.com/PWall2222/WB.
 
 Show the preferences window: `gnome-extensions prefs window-actions@hum.per.sg`
 
+Each button can be hidden individually.
+
 The extension mode affects how much resource the extension will use:
-|Mode |Description |
-|-|-|
-|Light|The "Always on Top" and "Always on Visible Workspace" toggles function just like normal buttons.|
-|Normal|If the "Always on Top" and/or "Always on Visible Workspace" state on the window are set, the corresponding toggle will stay highlighted. The toggles are updated whenever the focus window is changed.|
-|Full|If the "Always on Top" and/or "Always on Visible Workspace" state on the window are set, the corresponding toggle will stay highlighted. The toggles are updated whenever the states on the focus window are changed. If, other than the toggles, you also use the window menu to change the states, this mode ensures the toggles remain in sync in real time.|
+| Mode | Description |
+|:-----|:------------|
+| Light | "Always on Top" and "Always on Visible Workspace" work like typical buttons. |
+| Normal | If "Always on Top" and/or "Always on Visible Workspace" states are set, the corresponding toggles stay highlighted. The toggles are updated whenever the focus window changes. |
+| Full | If "Always on Top" and/or "Always on Visible Workspace" states are set, the corresponding toggles stay highlighted. The toggles are updated whenever these states on the focus window change. Choose this mode if you also use the window menu to change the states; it ensures the toggles remain in sync in real time. |
 
 After changing the mode, restart GNOME Shell for it to take effect.
